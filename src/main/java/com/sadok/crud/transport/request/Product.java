@@ -7,7 +7,7 @@ public class Product {
 	
 	private String ref;
 	private String name;
-	private Double price;
+	private Double price; 
 	private String description;
 
 }
