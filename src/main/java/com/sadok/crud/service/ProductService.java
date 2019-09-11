@@ -1,6 +1,7 @@
 package com.sadok.crud.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,13 +30,28 @@ public class ProductService {
 			return genericResponse;
 		}
 		productRepository.save(createProductBO(product));
-		return responseBuilder.buildResponse(ResponseCodes.SUCCESS_CREATE);
+		return responseBuilder.buildResponse(ResponseCodes.SUCCESS_CREATED);
+	}
+	
+	public GenericResponse updateProduct(Product product) {
+		GenericResponse genericResponse = validateProductForUpdate(product);
+		if(genericResponse!=null) {
+			return genericResponse;
+		}
+		Optional<ProductBO> optionalProductBO = productRepository.findById(product.getRef()); 
+		if(optionalProductBO.isPresent()) {
+			productRepository.save(createProductBO(product));
+			genericResponse = responseBuilder.buildResponse(ResponseCodes.SUCCESS_OK);
+		}else {
+			genericResponse = responseBuilder.buildResponse(ResponseCodes.PRODUCT_NOT_EXIST);
+		}
+		return genericResponse;
 	}
 
 	public GenericResponse listProducts() {
 		System.out.println("List all Products...");
 		List<ProductBO> products = (List<ProductBO>) productRepository.findAll();
-		ProductResponse productResponse = responseBuilder.buildProductsResponse(ResponseCodes.SUCCESS_RETRIEVE, products);
+		ProductResponse productResponse = responseBuilder.buildProductsResponse(ResponseCodes.SUCCESS_OK, products);
 		return productResponse;
 	}
 
@@ -44,7 +60,7 @@ public class ProductService {
 	}
 
 	private GenericResponse validateProductForCreate(Product product) {
-		System.out.println("Validate product");
+		System.out.println("Validate product for create...");
 		if (GenericAssister.isAnyStringEmpty(product.getRef(),product.getName())) {
 			System.out.println("Reference and/or product's name are missing");
 			return responseBuilder.buildResponse(ResponseCodes.MISSING_INPUT);
@@ -54,6 +70,16 @@ public class ProductService {
 		}
 		return null;
 	}
+	
+	private GenericResponse validateProductForUpdate(Product product) {
+		System.out.println("Validate product for update...");
+		if (GenericAssister.isAnyStringEmpty(product.getRef(),product.getName())) {
+			System.out.println("Reference and/or product's name are missing");
+			return responseBuilder.buildResponse(ResponseCodes.MISSING_INPUT);
+		}
+		return null;
+	}
+	
 	
 	private ProductBO createProductBO(Product product) {
 		ProductBO productBO = new ProductBO();

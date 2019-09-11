@@ -7,11 +7,12 @@ import lombok.Getter;
 @Getter
 public enum ResponseCodes {
 	
-	SUCCESS_CREATE("Success",HttpStatus.CREATED),
-	SUCCESS_RETRIEVE("Success",HttpStatus.OK),
+	SUCCESS_CREATED("Success",HttpStatus.CREATED),
+	SUCCESS_OK("Success",HttpStatus.OK),
 	MISSING_INPUT("Missing Inputs",HttpStatus.PRECONDITION_FAILED),
 	INVALID_INPUT("Invalid Input Provided",HttpStatus.EXPECTATION_FAILED),
 	PRODUCT_ALREADY_EXIST("Product Already exist in DB",HttpStatus.EXPECTATION_FAILED),
+	PRODUCT_NOT_EXIST("Product does not exist in DB",HttpStatus.EXPECTATION_FAILED),
 	INTERNAL_SERVER_ERROR("Internal Server Error",HttpStatus.INTERNAL_SERVER_ERROR);
 	
 	ResponseCodes(String status,HttpStatus httpStatus){
