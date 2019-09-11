@@ -20,33 +20,39 @@ import com.sadok.crud.transport.response.GenericResponse;
 @RestController
 @RequestMapping(value = "/products")
 public class ProductController {
-	
+
 	@Autowired
 	private ProductService productService;
-	
+
 	@PostMapping(value = "/save")
-	public @ResponseBody GenericResponse createProduct(@RequestBody Product product,HttpServletResponse response) {
+	public @ResponseBody GenericResponse createProduct(@RequestBody Product product, HttpServletResponse response) {
 		System.out.println(product);
 		GenericResponse genericResponse = productService.addProduct(product);
 		response.setStatus(genericResponse.getHttpStatus().value());
 		return genericResponse;
-		
+
 	}
-	
+
 	@PutMapping(value = "/update")
 	public void updateProduct() {
 		System.out.println("Updating product...");
 	}
-	
+
 	@GetMapping(value = "/list")
-	public void listProducts() {
-		System.out.println("Listing product...");
+	public @ResponseBody GenericResponse listProducts(HttpServletResponse response) {
+		try {
+		GenericResponse genericResponse = productService.listProducts();
+		response.setStatus(genericResponse.getHttpStatus().value());
+		return genericResponse;
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
 	}
-	
+
 	@DeleteMapping(value = "/delete")
 	public void deleteProduct() {
 		System.out.println("Deleting product...");
 	}
-	
 
 }

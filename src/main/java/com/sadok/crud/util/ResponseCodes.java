@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ResponseCodes {
 	
 	SUCCESS_CREATE("Success",HttpStatus.CREATED),
+	SUCCESS_RETRIEVE("Success",HttpStatus.OK),
 	MISSING_INPUT("Missing Inputs",HttpStatus.PRECONDITION_FAILED),
 	INVALID_INPUT("Invalid Input Provided",HttpStatus.EXPECTATION_FAILED),
 	PRODUCT_ALREADY_EXIST("Product Already exist in DB",HttpStatus.EXPECTATION_FAILED),

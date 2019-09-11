@@ -1,6 +1,6 @@
 package com.sadok.crud.service;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +8,7 @@ import com.sadok.crud.domain.ProductBO;
 import com.sadok.crud.repository.ProductRepository;
 import com.sadok.crud.transport.request.Product;
 import com.sadok.crud.transport.response.GenericResponse;
+import com.sadok.crud.transport.response.ProductResponse;
 import com.sadok.crud.util.GenericAssister;
 import com.sadok.crud.util.ResponseBuilder;
 import com.sadok.crud.util.ResponseCodes;
@@ -32,7 +33,10 @@ public class ProductService {
 	}
 
 	public GenericResponse listProducts() {
-		return new GenericResponse("Success");
+		System.out.println("List all Products...");
+		List<ProductBO> products = (List<ProductBO>) productRepository.findAll();
+		ProductResponse productResponse = responseBuilder.buildProductsResponse(ResponseCodes.SUCCESS_RETRIEVE, products);
+		return productResponse;
 	}
 
 	public GenericResponse deleteProducts() {
