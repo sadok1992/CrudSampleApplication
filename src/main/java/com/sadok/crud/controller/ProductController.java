@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.sadok.crud.service.ProductService;
@@ -45,8 +46,19 @@ public class ProductController {
 	}
 
 	@DeleteMapping(value = "/delete")
-	public void deleteProduct() {
+	public @ResponseBody GenericResponse deleteProduct(HttpServletResponse response,
+			@RequestParam String productReference) {
 		System.out.println("Deleting product...");
+		GenericResponse genericResponse = productService.deleteProducts(productReference);
+		response.setStatus(genericResponse.getHttpStatus().value());
+		return genericResponse;
+	}
+
+	@GetMapping(value = "/search")
+	public @ResponseBody GenericResponse searchProducts(HttpServletResponse response, @RequestParam String filter) {
+		GenericResponse genericResponse = productService.searchProducts(filter);
+		response.setStatus(genericResponse.getHttpStatus().value());
+		return genericResponse;
 	}
 
 }

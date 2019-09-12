@@ -1,9 +1,18 @@
 package com.sadok.crud.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.sadok.crud.domain.ProductBO;
 import com.sadok.crud.repository.ProductRepository;
@@ -19,30 +28,30 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository productRepository;
-	
+
 	@Autowired
 	private ResponseBuilder responseBuilder;
 
 	public GenericResponse addProduct(Product product) {
-		
+
 		GenericResponse genericResponse = validateProductForCreate(product);
-		if(genericResponse!=null) {
+		if (genericResponse != null) {
 			return genericResponse;
 		}
 		productRepository.save(createProductBO(product));
 		return responseBuilder.buildResponse(ResponseCodes.SUCCESS_CREATED);
 	}
-	
+
 	public GenericResponse updateProduct(Product product) {
 		GenericResponse genericResponse = validateProductForUpdate(product);
-		if(genericResponse!=null) {
+		if (genericResponse != null) {
 			return genericResponse;
 		}
-		Optional<ProductBO> optionalProductBO = productRepository.findById(product.getRef()); 
-		if(optionalProductBO.isPresent()) {
+		Optional<ProductBO> optionalProductBO = productRepository.findById(product.getRef());
+		if (optionalProductBO.isPresent()) {
 			productRepository.save(createProductBO(product));
 			genericResponse = responseBuilder.buildResponse(ResponseCodes.SUCCESS_OK);
-		}else {
+		} else {
 			genericResponse = responseBuilder.buildResponse(ResponseCodes.PRODUCT_NOT_EXIST);
 		}
 		return genericResponse;
@@ -55,32 +64,73 @@ public class ProductService {
 		return productResponse;
 	}
 
-	public GenericResponse deleteProducts() {
-		return new GenericResponse("Success");
+	public GenericResponse deleteProducts(String productReference) {
+		System.out.println("Delete product with reference ..." + productReference);
+		GenericResponse genericResponse = valiateProductForDelete(productReference);
+		if (genericResponse == null) {
+			productRepository.deleteById(productReference);
+			genericResponse = responseBuilder.buildResponse(ResponseCodes.SUCCESS_OK);
+		}
+		return genericResponse;
+	}
+
+	public GenericResponse searchProducts(String filter) {
+		String[] filterInputs;
+		Map<String, String> filterMap = new HashMap<String, String>();
+		try {
+			filterInputs = filter.split("\\|");
+			//System.out.println(filterInputs.as);
+			for (String f : filterInputs) {
+				String[] input = f.split("::");
+				filterMap.put(input[0], input[1]);
+			}
+		} catch (Exception e) {
+			System.out.println("Invalid filter inputs");
+			e.printStackTrace();
+			return responseBuilder.buildResponse(ResponseCodes.INVALID_INPUT);
+		}
+
+		List<ProductBO> products = retrieveProductsByFilter(filterMap);
+		ProductResponse productResponse = responseBuilder.buildProductsResponse(ResponseCodes.SUCCESS_OK, products);
+		
+		return productResponse;
+
 	}
 
 	private GenericResponse validateProductForCreate(Product product) {
 		System.out.println("Validate product for create...");
-		if (GenericAssister.isAnyStringEmpty(product.getRef(),product.getName())) {
+		if (GenericAssister.isAnyStringEmpty(product.getRef(), product.getName())) {
 			System.out.println("Reference and/or product's name are missing");
 			return responseBuilder.buildResponse(ResponseCodes.MISSING_INPUT);
 		}
-		if(productRepository.existsById(product.getRef())) {
+		if (productRepository.existsById(product.getRef())) {
 			return responseBuilder.buildResponse(ResponseCodes.PRODUCT_ALREADY_EXIST);
 		}
 		return null;
 	}
-	
+
 	private GenericResponse validateProductForUpdate(Product product) {
 		System.out.println("Validate product for update...");
-		if (GenericAssister.isAnyStringEmpty(product.getRef(),product.getName())) {
+		if (GenericAssister.isAnyStringEmpty(product.getRef(), product.getName())) {
 			System.out.println("Reference and/or product's name are missing");
 			return responseBuilder.buildResponse(ResponseCodes.MISSING_INPUT);
 		}
 		return null;
 	}
-	
-	
+
+	private GenericResponse valiateProductForDelete(String ref) {
+		System.out.println("Validate product for delete...");
+		if (GenericAssister.isStringEmpty(ref)) {
+			System.out.println("Reference is missing");
+			return responseBuilder.buildResponse(ResponseCodes.MISSING_INPUT);
+		}
+		if (!productRepository.existsById(ref)) {
+			System.out.println("Product Does not exist in DB");
+			return responseBuilder.buildResponse(ResponseCodes.PRODUCT_NOT_EXIST);
+		}
+		return null;
+	}
+
 	private ProductBO createProductBO(Product product) {
 		ProductBO productBO = new ProductBO();
 		productBO.setReference(product.getRef());
@@ -88,6 +138,34 @@ public class ProductService {
 		productBO.setPrice(product.getPrice());
 		productBO.setDescription(product.getDescription());
 		return productBO;
+	}
+
+	private List<ProductBO> retrieveProductsByFilter(Map<String, String> filterMap) {
+		List<ProductBO> products = productRepository.findAll(new Specification<ProductBO>() {
+
+
+			@Override
+			public Predicate toPredicate(Root<ProductBO> root, CriteriaQuery<?> query,
+					CriteriaBuilder criteriaBuilder) {
+				List<Predicate> predicates = new ArrayList<Predicate>();
+
+				if (filterMap.containsKey("reference")) {
+					System.out.println("Add reference criteria");
+					predicates.add(criteriaBuilder.equal(root.get("reference"), filterMap.get("reference")));
+				}
+				
+				if (filterMap.containsKey("name")) {
+					System.out.println("add name criteria");
+					predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("name")), filterMap.get("name").toLowerCase()));
+				}
+				
+				return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+			
+				
+			}
+		});
+		System.out.println(products.size());
+		return products;
 	}
 
 }
