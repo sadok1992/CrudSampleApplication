@@ -19,8 +19,9 @@ public class GlobalExceptionHandler {
 	private ResponseBuilder responseBuilder;
 	
 	@ExceptionHandler(Exception.class)
-	public @ResponseBody GenericResponse handleException(HttpServletResponse response) {
+	public @ResponseBody GenericResponse handleException(HttpServletResponse response, Exception ex) {
 		System.out.println("General Exception Executing...");
+		ex.printStackTrace();
 		response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		return responseBuilder.buildResponse(ResponseCodes.INTERNAL_SERVER_ERROR);
 	}

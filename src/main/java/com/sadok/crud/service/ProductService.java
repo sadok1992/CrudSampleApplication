@@ -20,6 +20,7 @@ import com.sadok.crud.transport.request.Product;
 import com.sadok.crud.transport.response.GenericResponse;
 import com.sadok.crud.transport.response.ProductResponse;
 import com.sadok.crud.util.GenericAssister;
+import com.sadok.crud.util.LogAround;
 import com.sadok.crud.util.ResponseBuilder;
 import com.sadok.crud.util.ResponseCodes;
 
@@ -32,6 +33,7 @@ public class ProductService {
 	@Autowired
 	private ResponseBuilder responseBuilder;
 
+	@LogAround
 	public GenericResponse addProduct(Product product) {
 
 		GenericResponse genericResponse = validateProductForCreate(product);
@@ -42,6 +44,7 @@ public class ProductService {
 		return responseBuilder.buildResponse(ResponseCodes.SUCCESS_CREATED);
 	}
 
+	@LogAround
 	public GenericResponse updateProduct(Product product) {
 		GenericResponse genericResponse = validateProductForUpdate(product);
 		if (genericResponse != null) {
@@ -57,6 +60,7 @@ public class ProductService {
 		return genericResponse;
 	}
 
+	@LogAround
 	public GenericResponse listProducts() {
 		System.out.println("List all Products...");
 		List<ProductBO> products = (List<ProductBO>) productRepository.findAll();
@@ -64,6 +68,7 @@ public class ProductService {
 		return productResponse;
 	}
 
+	@LogAround
 	public GenericResponse deleteProducts(String productReference) {
 		System.out.println("Delete product with reference ..." + productReference);
 		GenericResponse genericResponse = valiateProductForDelete(productReference);
@@ -74,6 +79,7 @@ public class ProductService {
 		return genericResponse;
 	}
 
+	@LogAround
 	public GenericResponse searchProducts(String filter) {
 		String[] filterInputs;
 		Map<String, String> filterMap = new HashMap<String, String>();
