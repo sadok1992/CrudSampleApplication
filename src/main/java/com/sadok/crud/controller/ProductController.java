@@ -24,7 +24,6 @@ public class ProductController {
 
 	@PostMapping(value = "/save")
 	public @ResponseBody GenericResponse createProduct(@RequestBody Product product, HttpServletResponse response) {
-		System.out.println(product);
 		GenericResponse genericResponse = productService.addProduct(product);
 		response.setStatus(genericResponse.getHttpStatus().value());
 		return genericResponse;
@@ -48,7 +47,6 @@ public class ProductController {
 	@DeleteMapping(value = "/delete")
 	public @ResponseBody GenericResponse deleteProduct(HttpServletResponse response,
 			@RequestParam String productReference) {
-		System.out.println("Deleting product...");
 		GenericResponse genericResponse = productService.deleteProducts(productReference);
 		response.setStatus(genericResponse.getHttpStatus().value());
 		return genericResponse;

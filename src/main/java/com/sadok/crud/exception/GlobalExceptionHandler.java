@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sadok.crud.transport.response.GenericResponse;
+import com.sadok.crud.util.LogAround;
 import com.sadok.crud.util.ResponseBuilder;
 import com.sadok.crud.util.ResponseCodes;
 
@@ -19,8 +20,8 @@ public class GlobalExceptionHandler {
 	private ResponseBuilder responseBuilder;
 	
 	@ExceptionHandler(Exception.class)
+	@LogAround
 	public @ResponseBody GenericResponse handleException(HttpServletResponse response, Exception ex) {
-		System.out.println("General Exception Executing...");
 		ex.printStackTrace();
 		response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		return responseBuilder.buildResponse(ResponseCodes.INTERNAL_SERVER_ERROR);

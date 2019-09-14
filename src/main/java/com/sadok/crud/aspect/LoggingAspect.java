@@ -5,16 +5,21 @@ import java.util.Calendar;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
-
 
 @Aspect
 @Configuration
 public class LoggingAspect {
+	
+	Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
 	@Around("@annotation(com.sadok.crud.util.LogAround)")
 	public Object logMethod(ProceedingJoinPoint joinPoint) throws Throwable {
-		System.out.println("Enter method: " + joinPoint.getSignature().getName());
+
+		logger.info("class : " + joinPoint.getSignature().getDeclaringTypeName() + " Enter method: "
+				+ joinPoint.getSignature().getName());
 		Long startTime = Calendar.getInstance().getTimeInMillis();
 		Object o = null;
 		try {
@@ -23,10 +28,10 @@ public class LoggingAspect {
 			e.printStackTrace();
 		}
 		Long endTime = Calendar.getInstance().getTimeInMillis();
-		System.out.println("Quit method : " + joinPoint.getSignature().getName() + " with execution time :"
-				+ String.valueOf(endTime - startTime));
+
+		logger.info("class : " + joinPoint.getClass().getSimpleName() + " Quit method : "
+				+ joinPoint.getSignature().getDeclaringTypeName() + " with execution time :" + String.valueOf(endTime - startTime));
 		return o;
 	}
-
 
 }

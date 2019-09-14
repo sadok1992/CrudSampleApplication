@@ -62,7 +62,6 @@ public class ProductService {
 
 	@LogAround
 	public GenericResponse listProducts() {
-		System.out.println("List all Products...");
 		List<ProductBO> products = (List<ProductBO>) productRepository.findAll();
 		ProductResponse productResponse = responseBuilder.buildProductsResponse(ResponseCodes.SUCCESS_OK, products);
 		return productResponse;
@@ -70,7 +69,6 @@ public class ProductService {
 
 	@LogAround
 	public GenericResponse deleteProducts(String productReference) {
-		System.out.println("Delete product with reference ..." + productReference);
 		GenericResponse genericResponse = valiateProductForDelete(productReference);
 		if (genericResponse == null) {
 			productRepository.deleteById(productReference);
@@ -91,7 +89,6 @@ public class ProductService {
 				filterMap.put(input[0], input[1]);
 			}
 		} catch (Exception e) {
-			System.out.println("Invalid filter inputs");
 			e.printStackTrace();
 			return responseBuilder.buildResponse(ResponseCodes.INVALID_INPUT);
 		}
@@ -104,9 +101,7 @@ public class ProductService {
 	}
 
 	private GenericResponse validateProductForCreate(Product product) {
-		System.out.println("Validate product for create...");
 		if (GenericAssister.isAnyStringEmpty(product.getRef(), product.getName())) {
-			System.out.println("Reference and/or product's name are missing");
 			return responseBuilder.buildResponse(ResponseCodes.MISSING_INPUT);
 		}
 		if (productRepository.existsById(product.getRef())) {
@@ -116,22 +111,17 @@ public class ProductService {
 	}
 
 	private GenericResponse validateProductForUpdate(Product product) {
-		System.out.println("Validate product for update...");
 		if (GenericAssister.isAnyStringEmpty(product.getRef(), product.getName())) {
-			System.out.println("Reference and/or product's name are missing");
 			return responseBuilder.buildResponse(ResponseCodes.MISSING_INPUT);
 		}
 		return null;
 	}
 
 	private GenericResponse valiateProductForDelete(String ref) {
-		System.out.println("Validate product for delete...");
 		if (GenericAssister.isStringEmpty(ref)) {
-			System.out.println("Reference is missing");
 			return responseBuilder.buildResponse(ResponseCodes.MISSING_INPUT);
 		}
 		if (!productRepository.existsById(ref)) {
-			System.out.println("Product Does not exist in DB");
 			return responseBuilder.buildResponse(ResponseCodes.PRODUCT_NOT_EXIST);
 		}
 		return null;
@@ -156,21 +146,16 @@ public class ProductService {
 				List<Predicate> predicates = new ArrayList<Predicate>();
 
 				if (filterMap.containsKey("reference")) {
-					System.out.println("Add reference criteria");
 					predicates.add(criteriaBuilder.equal(root.get("reference"), filterMap.get("reference")));
 				}
 				
 				if (filterMap.containsKey("name")) {
-					System.out.println("add name criteria");
 					predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("name")), filterMap.get("name").toLowerCase()));
 				}
 				
 				return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-			
-				
 			}
 		});
-		System.out.println(products.size());
 		return products;
 	}
 
