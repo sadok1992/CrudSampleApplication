@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Aspect
 @Configuration
 public class LoggingAspect {
-	
+
 	Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
 	@Around("@annotation(com.sadok.crud.util.LogAround)")
@@ -29,8 +29,8 @@ public class LoggingAspect {
 		}
 		Long endTime = Calendar.getInstance().getTimeInMillis();
 
-		logger.info("class : " + joinPoint.getClass().getSimpleName() + " Quit method : "
-				+ joinPoint.getSignature().getDeclaringTypeName() + " with execution time :" + String.valueOf(endTime - startTime));
+		logger.info("class : " + joinPoint.getSignature().getDeclaringTypeName() + " Quit method : "
+				+ joinPoint.getSignature().getName() + " with execution time :" + String.valueOf(endTime - startTime));
 		return o;
 	}
 
